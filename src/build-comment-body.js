@@ -4,6 +4,13 @@ module.exports = (ctx) => {
     const NO_COVERAGE = -1;
     const ENTITIES = ['INSTRUCTION', 'BRANCH', 'LINE'];
     const HEADERS = ['Check', 'Expected', 'Entity', 'Actual'];
+
+    const NO_COVERAGE_TEXT = 'No diff';
+    const SUCCESS_COLOR = '7AB56D';
+    const ALMOST_SUCCESS_COLOR = 'B6743B';
+    const FAILURE_COLOR = 'C4625A';
+    const NO_COVERAGE_COLOR = '498BC4';
+
     const TOOLTIPS = new Map([
         ['INSTRUCTION', 'The Java bytecode instructions executed during testing'],
         ['BRANCH', 'The branches in conditional statements like if, switch, or loops that are executed.'],
@@ -46,10 +53,25 @@ module.exports = (ctx) => {
     };
 
     const buildCheckRunForViewText = (checkRun) => {
-        const buildProgressImgLink = (entityData) => {
-            const color = entityData.actual < entityData.expected ? 'C4625A' : '7AB56D';
-            const actualInteger = Math.round(entityData.actual);
-            return `https://progress-bar.xyz/${actualInteger}/?progress_color=${color}`;
+        const buildProgressImg = (entityData) => {
+            let imageLink;
+            if (entityData.actual > NO_COVERAGE ) {
+                const actualToExpectedDiff = entityData.actual - entityData.expected
+                let color ;
+                if (actualToExpectedDiff < 0 && actualToExpectedDiff > -10) {
+                    color = ALMOST_SUCCESS_COLOR;
+                } else if (actualToExpectedDiff < 0) {
+                    color = FAILURE_COLOR;
+                } else if (actualToExpectedDiff >= 0) {
+                    color = SUCCESS_COLOR
+                }
+                const actualInteger = Math.round(entityData.actual);
+                imageLink = `https://progress-bar.xyz/${actualInteger}/?progress_color=${color}`;
+            } else {
+                imageLink = `https://progress-bar.xyz/100/?show_text=false&width=38` +
+                    `&progress_color=${NO_COVERAGE_COLOR}&title=${NO_COVERAGE_TEXT}`;
+            }
+            return `<img src="${imageLink}" />`;
         }
 
         const isSameExpectedForAllEntities = (viewSummaryData) => {
@@ -80,9 +102,7 @@ module.exports = (ctx) => {
 
             const ruleColumnHtml = buildRuleValueColumnHtml(entityData, index, shouldFoldExpectedColumn);
 
-            const actualValue = entityData.actual > NO_COVERAGE
-                ? `<img src="${buildProgressImgLink(entityData)}" />`
-                : '';
+            const actualValue = buildProgressImg(entityData);
             const toolTipText = TOOLTIPS.get(entityData.entity) || '';
 
             return `<tr>

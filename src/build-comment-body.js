@@ -12,9 +12,10 @@ module.exports = (ctx) => {
 
     const buildViewSummaryData = (checkRun) => {
         const entitiesRules = checkRun.coverageRules?.entitiesRules || [];
-        const entityToExpectedRatio = new Map();
+        const entityToExpectedPercents = new Map();
         for (const [entityName, entityConfig] of Object.entries(entitiesRules)) {
-            entityToExpectedRatio.set(entityName, entityConfig.minCoverageRatio);
+            const percents = entityConfig.minCoverageRatio * 100;
+            entityToExpectedPercents.set(entityName, percents);
         }
 
         const entityToActualPercents = checkRun.coverageInfo.reduce((acc, it) => {
@@ -24,13 +25,17 @@ module.exports = (ctx) => {
             return acc;
         }, new Map());
 
+        const shouldFailOnViolations = checkRun.coverageRules?.failOnViolation || false;
         return ENTITIES.map((entity) => {
-            const expectedRatio = entityToExpectedRatio.get(entity) || NO_EXPECTED;
-            const expectedPercents = expectedRatio * 100;
+            const expectedPercents = entityToExpectedPercents.get(entity) || NO_EXPECTED;
+
             const actualPercents = entityToActualPercents.get(entity) !== undefined
                 ? entityToActualPercents.get(entity)
                 : NO_COVERAGE;
-            const isFailed = actualPercents > NO_COVERAGE && actualPercents < expectedPercents;
+
+            const isFailed = shouldFailOnViolations
+                && actualPercents > NO_COVERAGE
+                && actualPercents < expectedPercents;
             return {
                 entity,
                 isFailed,

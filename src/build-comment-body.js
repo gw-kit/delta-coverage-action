@@ -2,14 +2,16 @@ module.exports = (ctx) => {
 
     const NO_EXPECTED = -1;
     const NO_COVERAGE = -1;
+    const ENTITIES = ['INSTRUCTION', 'BRANCH', 'LINE'];
+    const HEADERS = ['Check', 'Expected', 'Entity', 'Actual'];
     const TOOLTIPS = new Map([
         ['INSTRUCTION', 'The Java bytecode instructions executed during testing'],
-        ['BRANCH', 'he branches in conditional statements like if, switch, or loops that are executed.'],
+        ['BRANCH', 'The branches in conditional statements like if, switch, or loops that are executed.'],
         ['LINE', 'The source code lines covered by the tests.']
     ])
 
     const buildViewSummaryData = (checkRun) => {
-        const entitiesRules = checkRun.coverageRules.entitiesRules;
+        const entitiesRules = checkRun.coverageRules?.entitiesRules || [];
         const entityToExpectedRatio = new Map();
         for (const [entityName, entityConfig] of Object.entries(entitiesRules)) {
             entityToExpectedRatio.set(entityName, entityConfig.minCoverageRatio);
@@ -22,11 +24,12 @@ module.exports = (ctx) => {
             return acc;
         }, new Map());
 
-        const entities = [ ...entityToExpectedRatio.keys() ];
-        return entities.map((entity) => {
+        return ENTITIES.map((entity) => {
             const expectedRatio = entityToExpectedRatio.get(entity) || NO_EXPECTED;
             const expectedPercents = expectedRatio * 100;
-            const actualPercents = entityToActualPercents.get(entity) || NO_COVERAGE;
+            const actualPercents = entityToActualPercents.get(entity) !== undefined
+                ? entityToActualPercents.get(entity)
+                : NO_COVERAGE;
             const isFailed = actualPercents > NO_COVERAGE && actualPercents < expectedPercents;
             return {
                 entity,
@@ -79,11 +82,15 @@ module.exports = (ctx) => {
 
             return `<tr>
                 ${viewCellInRow}
-                <td><span title="${toolTipText}">${entityData.entity}</span></td>
                 ${ruleColumnHtml}
+                <td><span title="${toolTipText}">${entityData.entity}</span></td>
                 <td>${actualValue}</td>
             </tr>`.trim().replace(/^ +/gm, '');
         }).join('\n');
+    }
+
+    const renderHeaders = () => {
+        return '<tr>' + HEADERS.map(it => `<th>${it}</th>`).join('\n') + '</tr>';
     }
 
     const checkRuns = JSON.parse(ctx.checkRunsContent);
@@ -91,7 +98,8 @@ module.exports = (ctx) => {
         .addHeading(ctx.commentTitle, '2')
         .addRaw(ctx.commentMarker, true)
         .addEOL()
-        .addRaw(`<table><tbody>`);
+        .addRaw(`<table><tbody>`)
+        .addRaw(renderHeaders());
 
     checkRuns.forEach(checkRun => {
         const runText = buildCheckRunForViewText(checkRun);

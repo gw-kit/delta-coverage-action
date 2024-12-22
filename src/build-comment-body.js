@@ -5,7 +5,7 @@ module.exports = (ctx) => {
     const ENTITIES = ['INSTRUCTION', 'BRANCH', 'LINE'];
     const HEADERS = ['Check', 'Expected', 'Entity', 'Actual'];
 
-    const NO_COVERAGE_TEXT = 'No diff';
+    const NO_COVERAGE_TEXT = 'No%20diff';
     const SUCCESS_COLOR = '7AB56D';
     const ALMOST_SUCCESS_COLOR = 'B6743B';
     const FAILURE_COLOR = 'C4625A';

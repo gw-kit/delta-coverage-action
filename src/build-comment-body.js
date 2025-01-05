@@ -1,3 +1,5 @@
+const { GITHUB_SERVER_URL, GITHUB_REPOSITORY, GITHUB_RUN_ID, GITHUB_RUN_NUMBER, GITHUB_RUN_ATTEMPT } = process.env;
+
 module.exports = (ctx) => {
 
     const NO_VALUE = -1;
@@ -13,7 +15,10 @@ module.exports = (ctx) => {
         ['INSTRUCTION', 'The Java bytecode instructions executed during testing'],
         ['BRANCH', 'The branches in conditional statements like if, switch, or loops that are executed.'],
         ['LINE', 'The source code lines covered by the tests.']
-    ])
+    ]);
+
+    const workflowUrl = `${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}`;
+    const workflowNum = `${GITHUB_RUN_NUMBER}.${GITHUB_RUN_ATTEMPT}`
 
     const buildViewSummaryData = (checkRun) => {
         const entitiesRules = checkRun.coverageRules?.entitiesRules || [];
@@ -117,6 +122,15 @@ module.exports = (ctx) => {
         return '<tr>' + HEADERS.map(it => `<th>${it}</th>`).join('\n') + '</tr>';
     }
 
+    const buildRunMetaText = () => {
+        const workflowRunDate = new Date();
+        const options = { month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' };
+
+        const workflowRunLink = `[Run ${workflowNum}](${workflowUrl})`;
+        const formattedDate = workflowRunDate.toLocaleString('en-US', options);
+        return `${workflowRunLink} | \`${formattedDate}\``;
+    };
+
     const checkRuns = JSON.parse(ctx.checkRunsContent);
     let summaryBuffer = ctx.core.summary
         .addHeading(ctx.commentTitle, '2')
@@ -129,7 +143,11 @@ module.exports = (ctx) => {
         const runText = buildCheckRunForViewText(checkRun);
         summaryBuffer = summaryBuffer.addRaw(runText, true);
     });
+
     return summaryBuffer
         .addRaw(`</tbody></table>`)
+        .addEOL()
+        .addEOL()
+        .addRaw(buildRunMetaText())
         .stringify()
 };

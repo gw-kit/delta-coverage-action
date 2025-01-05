@@ -128,7 +128,7 @@ module.exports = (ctx) => {
 
         const workflowRunLink = `[Run ${workflowNum}](${workflowUrl})`;
         const formattedDate = workflowRunDate.toLocaleString('en-US', options);
-        return `${workflowRunLink} | ${formattedDate}`;
+        return `${workflowRunLink} | \`${formattedDate}\``;
     };
 
     const checkRuns = JSON.parse(ctx.checkRunsContent);
@@ -146,6 +146,7 @@ module.exports = (ctx) => {
 
     return summaryBuffer
         .addRaw(`</tbody></table>`)
+        .addEOL()
         .addEOL()
         .addRaw(buildRunMetaText())
         .stringify()

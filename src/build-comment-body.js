@@ -60,7 +60,7 @@ module.exports = (ctx) => {
             let imageLink;
             if (entityData.actual > NO_VALUE ) {
                 const color = entityData.actual < entityData.expected ? FAILURE_COLOR : SUCCESS_COLOR;
-                const actualInteger = Math.round(entityData.actual);
+                const actualInteger = Math.floor(entityData.actual);
                 imageLink = `https://progress-bar.xyz/${actualInteger}/?progress_color=${color}`;
             } else {
                 imageLink = `https://progress-bar.xyz/100/?show_text=false&width=38`

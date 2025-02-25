@@ -14,7 +14,6 @@ inputs:
   suppress-check-failures:
     description: 'Suppress failures.'
     required: false
-    default: ${{ contains(github.event.pull_request.labels.*.name, 'suppress-delta-coverage') }}
 
   github-token:
     description: 'GitHub token.'
@@ -42,6 +41,24 @@ runs:
           const allSummariesFile = 'all-summaries.json';
           fs.writeFileSync(allSummariesFile, allSummaries);
           core.setOutput('file', allSummariesFile);
+
+    - name: Fetch PR Labels
+      id: fetch-labels
+      run: |
+        LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
+        LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
+        echo "labels=$LABELS_CLEAN" >> $GITHUB_ENV
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check for Suppress Label
+      id: check-label
+      run: |
+        if echo "$labels" | grep -q 'suppress-delta-coverage'; then
+          echo "suppress_check_failures=true" >> $GITHUB_ENV
+        else
+          echo "suppress_check_failures=false" >> $GITHUB_ENV
+        fi        
 
     - name: Create Check Run
       id: create-check-runs

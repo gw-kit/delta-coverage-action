@@ -31,6 +31,8 @@ module.exports = async (ctx) => {
     const createCheckRun = async (view) => {
         const conclusion = computeViewConclusion(view);
         const viewName = capitalize(view.view);
+        const summary = `${readViewMarkdownReport(view)}\n\n<!-- This is Delta Coverage CheckRun -->`;
+
         const response = await ctx.github.rest.checks.create({
             owner: ctx.context.repo.owner,
             repo: ctx.context.repo.repo,
@@ -40,7 +42,7 @@ module.exports = async (ctx) => {
             conclusion: conclusion,
             output: {
                 title: `${viewName} Coverage`,
-                summary: readViewMarkdownReport(view),
+                summary: summary,
             }
         });
         return {

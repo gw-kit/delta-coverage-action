@@ -71,7 +71,7 @@ runs:
           const createCheckRuns = require('${{ github.action_path }}/src/create-check-runs.js');
           const checkRuns = await createCheckRuns({
             summaryReportPath: `${{ steps.all-summaries.outputs.file }}`,
-            ignoreCoverageFailure: ${{ inputs.suppress-check-failures }} || process.env.suppress_check_failures,
+            ignoreCoverageFailure: ${{ inputs.suppress-check-failures || env.suppress_check_failures }},
             core: core,
             context: context,
             github: github,

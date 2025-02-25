@@ -44,22 +44,24 @@ runs:
 
     - name: Fetch PR Labels
       id: fetch-labels
+      if: ${{ !inputs.suppress-check-failures }}
       shell: 'bash'
       run: |
         LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
         LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
-        echo "labels=$LABELS_CLEAN" >> $GITHUB_ENV
+        echo "labels=$LABELS_CLEAN" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ inputs.github-token }}
 
     - name: Check for Suppress Label
       id: check-label
+      if: ${{ !inputs.suppress-check-failures }}
       shell: 'bash'
       run: |
         if echo "$labels" | grep -q 'suppress-delta-coverage'; then
-          echo "suppress_check_failures=true" >> $GITHUB_ENV
+          echo "suppress_check_failures=true" >> $GITHUB_OUTPUT
         else
-          echo "suppress_check_failures=false" >> $GITHUB_ENV
+          echo "suppress_check_failures=false" >> $GITHUB_OUTPUT
         fi        
 
     - name: Create Check Run
@@ -71,7 +73,7 @@ runs:
           const createCheckRuns = require('${{ github.action_path }}/src/create-check-runs.js');
           const checkRuns = await createCheckRuns({
             summaryReportPath: `${{ steps.all-summaries.outputs.file }}`,
-            ignoreCoverageFailure: ${{ inputs.suppress-check-failures || env.suppress_check_failures }},
+            ignoreCoverageFailure: ${{ inputs.suppress-check-failures || steps.check-label.outputs.suppress_check_failures }},
             core: core,
             context: context,
             github: github,

@@ -44,15 +44,17 @@ runs:
 
     - name: Fetch PR Labels
       id: fetch-labels
+      shell: 'bash'
       run: |
         LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
         LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
         echo "labels=$LABELS_CLEAN" >> $GITHUB_ENV
       env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GH_TOKEN: ${{ inputs.github-token }}
 
     - name: Check for Suppress Label
       id: check-label
+      shell: 'bash'
       run: |
         if echo "$labels" | grep -q 'suppress-delta-coverage'; then
           echo "suppress_check_failures=true" >> $GITHUB_ENV

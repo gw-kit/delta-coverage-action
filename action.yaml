@@ -59,9 +59,9 @@ runs:
       shell: 'bash'
       run: |
         if echo "${{ steps.fetch-labels.outputs.labels }}" | grep -q 'suppress-delta-coverage'; then
-        echo "suppress_check_failures=true" >> $GITHUB_OUTPUT
+          echo "suppress_check_failures=true" >> $GITHUB_OUTPUT
         else
-        echo "suppress_check_failures=false" >> $GITHUB_OUTPUT
+          echo "suppress_check_failures=false" >> $GITHUB_OUTPUT
         fi    
 
     - name: Create Check Run

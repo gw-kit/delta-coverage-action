@@ -20,6 +20,11 @@ inputs:
     required: false
     default: ${{ github.token }}
 
+  external-id:
+    description: 'External id of check run.'
+    required: false
+    default: 'delta-coverage'
+
 runs:
   using: "composite"
 
@@ -77,7 +82,8 @@ runs:
             core: core,
             context: context,
             github: github,
-            headSha: `${{ github.event.pull_request.head.sha }}`
+            headSha: `${{ github.event.pull_request.head.sha }}`,
+            externalId: `${{ inputs.external-id }}`
           });
           core.setOutput('check-runs', checkRuns);
 

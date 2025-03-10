@@ -39,6 +39,7 @@ module.exports = async (ctx) => {
             name: `📈${viewName} Coverage`,
             head_sha: ctx.headSha,
             status: 'completed',
+            external_id: 'ajax-delta-coverage',
             conclusion: conclusion,
             output: {
                 title: `${viewName} Coverage`,

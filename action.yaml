@@ -83,7 +83,7 @@ runs:
             context: context,
             github: github,
             headSha: `${{ github.event.pull_request.head.sha }}`,
-            externalId: `${{ inputs.external-id}}`
+            externalId: `${{ inputs.external-id }}`
           });
           core.setOutput('check-runs', checkRuns);
 

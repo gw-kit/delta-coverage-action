@@ -38,7 +38,9 @@ runs:
         script: |
           const fs = require('fs');
           const files = fs.readdirSync(`${{ inputs.summary-report-base-path }}`);
-          const summaryFiles = files.filter(file => file.includes('-summary.json'));
+          const summaryFiles = files.filter(file => file.includes('-summary.json'))
+            .filter(file => !file.includes('full-coverage-'));
+          
           const summaries = summaryFiles.map(file => 
             JSON.parse(fs.readFileSync(`build/reports/coverage-reports/${file}`, 'utf8'))
           );

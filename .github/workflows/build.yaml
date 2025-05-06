@@ -30,12 +30,13 @@ jobs:
           color: 'blue,555,daf'
           path: 'coverage.svg'
 
-      - name: Append Badge to Summary
-        run: |
-          echo "![Test coverage](coverage.svg)" >> $GITHUB_STEP_SUMMARY
-
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: coverage.svg
           path: coverage.svg
+
+      - name: Append Badge to Summary
+        run: |
+          echo "![Test coverage](coverage.svg)" >> $GITHUB_STEP_SUMMARY
+

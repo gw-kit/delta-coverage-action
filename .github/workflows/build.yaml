@@ -42,4 +42,5 @@ jobs:
           id='${{ steps.artifact.outputs.artifact-id }}'
           url="https://api.github.com/repos/gw-kit/delta-coverage-action/actions/artifacts/$id/zip"
           echo "Badge:" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.artifact.outputs.artifact-id }}"  >> $GITHUB_STEP_SUMMARY
           echo "![Test coverage]($url)" >> $GITHUB_STEP_SUMMARY

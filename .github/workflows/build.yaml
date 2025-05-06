@@ -1,0 +1,36 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'main'
+      - 'release/**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      packages: write
+
+    steps:
+      - name: Gen Badge
+        uses: emibcn/badge-action@v2.0.2
+        with:
+          label: 'Test coverage'
+          status: '53.4%'
+          color: 'blue,555,daf'
+          path: 'coverage.svg'
+
+      - name: Append Badge to Summary
+        run: |
+          echo "![Test coverage](coverage.svg)" >> $GITHUB_STEP_SUMMARY
+          echo "![Test coverage](coverage.svg)" >> $GITHUB_ENV

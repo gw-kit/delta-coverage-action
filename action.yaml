@@ -46,7 +46,7 @@ runs:
             isFullCoverageMode: true,
             baseSummariesPath: summariesBaseDir,
           });
-          core.setOutput('delta', summariesFile);
+          core.setOutput('delta', deltaSummariesFile);
           core.setOutput('full', fullCovSummariesFile);
 
     - name: install gradient-badge

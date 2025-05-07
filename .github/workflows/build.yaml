@@ -22,6 +22,11 @@ jobs:
       packages: write
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
       - name: Delta Coverage Action
         uses: gw-kit/delta-coverage-action@test-badges
         with:

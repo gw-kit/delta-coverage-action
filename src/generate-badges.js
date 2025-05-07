@@ -43,14 +43,10 @@ const allBadges = summaries
             file: path.join(badgesOutputDir, `${viewBadgeData.view}.svg`),
             badgeContent: gradientBadge(viewBadgeData.badgeInputs),
         };
-    }).map(badge => {
+    }).forEach(badge => {
         fs.writeFileSync(badge.file, badge.badgeContent);
-        return badge;
+        core.info(`Generated badge for ${badge.view} at ${badge.file}`);
+        core.setOutput(badge.view, badge.file);
     });
 
-allBadges.forEach(badge => {
-    core.info(`Generated badge for ${badge.view} at ${badge.file}`);
-    core.setOutput(badge.view, badge.file);
-});
-
-core.setOutput('all-files', allBadges.map(it => it.file).join(' '));
+core.setOutput('all-files', badgesOutputDir);

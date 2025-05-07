@@ -53,4 +53,4 @@ allBadges.forEach(badge => {
     core.setOutput(badge.view, badge.file);
 });
 
-core.setOutput('all-files', allBadges.join(' '));
+core.setOutput('all-files', allBadges.map(it => it.file).join(' '));

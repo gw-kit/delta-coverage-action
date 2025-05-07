@@ -49,14 +49,15 @@ runs:
           core.setOutput('delta', deltaSummariesFile);
           core.setOutput('full', fullCovSummariesFile);
 
-    - shell: bash
-      run: npm install gradient-badge
-
     - name: Generate Badges
       id: generate-badges
       continue-on-error: true
       shell: bash
-      run: node ${{ github.action_path }}/src/generate-badges.js ${{ steps.all-summaries.outputs.full }}
+      run: |
+        npm install gradient-badge
+        src_path="${{ github.action_path }}/src"
+        mv ./node_modules $src_path/
+        node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
 
     - name: Render Badges in Summaries
       continue-on-error: true

@@ -37,4 +37,4 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: coverage-gen.svg
-          path: coverage-gen.svg
+          path: ${{ steps.generate-badges.outputs.* }}

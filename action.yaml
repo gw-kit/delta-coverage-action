@@ -49,6 +49,33 @@ runs:
           core.setOutput('delta', summariesFile);
           core.setOutput('full', fullCovSummariesFile);
 
+    - name: install gradient-badge
+      shell: bash
+      run: npm install gradient-badge
+
+    - name: Generate Badges
+      id: generate-badges
+      continue-on-error: true
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const generate = require('${{ github.action_path }}/src/generate-badges.js');
+          const badges = await generate({
+            summariesFile: `${{ steps.all-summaries.outputs.full }}`,
+          });
+          badges.forEach((badge) => {
+            core.setOutput(badge.view, badge.file);
+          });
+
+    - name: Render Badges in Summaries
+      continue-on-error: true
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const badgesFiles = JSON.parse(`${{ fromJson(steps.generate-badges.outputs) }}`);
+          const render = require('${{ github.action_path }}/src/render-badges-in-summaries.js');
+          await render({ badgesFiles });
+
     - name: Fetch PR Labels
       id: fetch-labels
       if: ${{ !inputs.suppress-check-failures }}

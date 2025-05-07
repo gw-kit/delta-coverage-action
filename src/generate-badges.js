@@ -27,7 +27,8 @@ module.exports = async (ctx) => {
         };
     };
 
-    const badgeData = ctx.summaries
+    const summaries = JSON.parse(fs.readFileSync(ctx.summariesFile, 'utf8'));
+    const badgeData = summaries
         .sort((a, b) => a.view.localeCompare(b.view))
         .map((summary, index) => {
             return {

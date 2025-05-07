@@ -22,32 +22,10 @@ jobs:
       packages: write
 
     steps:
-      - name: install gradient-badge
-        run: npm install gradient-badge
-
-      - name: create-badge
-        uses: actions/github-script@v7
+      - name: Delta Coverage Action
+        uses: gw-kit/delta-coverage-action@test-badges
         with:
-          script: |
-            const gradientBadge = require('gradient-badge');
-  
-            const svgString = gradientBadge({
-              subject: 'version', // <text>
-              status: 'v1.2.3', // <text>
-              style: 'flat', // 'flat' or undefined, optional
-                // And any other parameter supported by badgen (icon, scale...)
-              gradient: ['pink', 'F78642'], // array of colors (Hexadecimal or name)
-            });
-            const fs = require('fs');
-            fs.writeFileSync('coverage-gen.svg', svgString)
-
-#      - name: Gen Badge
-#        uses: emibcn/badge-action@v2.0.2
-#        with:
-#          label: 'Test coverage'
-#          status: '53.4%'
-#          color: 'blue,555,daf'
-#          path: 'coverage.svg'
+          summary-report-base-path: 'summaries/'
 
       - name: Upload Artifact
         id: artifact
@@ -55,4 +33,3 @@ jobs:
         with:
           name: coverage-gen.svg
           path: coverage-gen.svg
-

@@ -10,5 +10,6 @@ module.exports = async (ctx) => {
                 return buffer.addRaw(badge, true)
             },
             ctx.core.summary.addHeading('Coverage Badges', '4').addEOL()
-        );
+        )
+        .write();
 };

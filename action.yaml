@@ -59,14 +59,11 @@ runs:
         mv ./node_modules $src_path/
         node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
 
-    - name: Render Badges in Summaries
-      continue-on-error: true
-      uses: actions/github-script@v7
+    - id: upload-badges
+      uses: actions/upload-artifact@v4
       with:
-        script: |
-          const badgesFiles = JSON.parse(`${{ toJson(steps.generate-badges.outputs) }}`);
-          const render = require('${{ github.action_path }}/src/render-badges-in-summaries.js');
-          await render({ badgesFiles, core });
+        name: coverage-gen.svg
+        path: ${{ steps.generate-badges.outputs.all-files }}
 
     - name: Fetch PR Labels
       id: fetch-labels

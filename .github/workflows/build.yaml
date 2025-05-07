@@ -31,10 +31,3 @@ jobs:
         uses: gw-kit/delta-coverage-action@test-badges
         with:
           summary-report-base-path: 'summaries/'
-
-      - name: Upload Artifact
-        id: artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: coverage-gen.svg
-          path: ${{ steps.generate-badges.outputs.* }}

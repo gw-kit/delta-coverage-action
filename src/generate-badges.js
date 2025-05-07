@@ -6,7 +6,7 @@ const core = require('@actions/core');
 const badgesOutputDir = 'badges/';
 fs.mkdirSync(badgesOutputDir, {recursive: true});
 
-const secondColor = '#11cbfa'; // blue
+const secondColor = '#117efa'; // blue
 const firstColors = [
     '#ea00ff', // purple
     '#00ff0d', // green
@@ -29,7 +29,7 @@ const mapToBadgeInputs = (index, summary) => {
 
 const [, , summariesFile] = process.argv;
 const summaries = JSON.parse(fs.readFileSync(summariesFile, 'utf8'));
-summaries
+const allFiles = summaries
     .sort((a, b) => a.view.localeCompare(b.view))
     .map((summary, index) => {
         return {
@@ -43,8 +43,14 @@ summaries
             file: path.join(badgesOutputDir, `${viewBadgeData.view}.svg`),
             badgeContent: gradientBadge(viewBadgeData.badgeInputs),
         };
-    }).forEach(badge => {
+    }).map(badge => {
         fs.writeFileSync(badge.file, badge.badgeContent);
-        core.setOutput(badge.view, badge.file);
+        return badge;
     });
 
+allFiles.forEach(badge => {
+    core.info(`Generated badge for ${badge.view} at ${badge.file}`);
+    core.setOutput(badge.view, badge.file);
+});
+
+core.setOutput('all-files', allBadges.join(' '));

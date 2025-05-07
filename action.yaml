@@ -30,13 +30,6 @@ runs:
 
   steps:
 
-    - name: Install Deps
-      shell: bash
-      run: |
-        npm install gradient-badge @actions/core
-        src_path="${{ github.action_path }}/src"
-        mv ./node_modules $src_path/
-
     - name: Build All Summaries
       id: all-summaries
       uses: actions/github-script@v7
@@ -60,7 +53,11 @@ runs:
       id: generate-badges
       continue-on-error: true
       shell: bash
-      run: node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
+      run: |
+        npm install gradient-badge @actions/core
+        src_path="${{ github.action_path }}/src"
+        mv ./node_modules $src_path/
+        node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
 
     - name: Render Badges in Summaries
       continue-on-error: true

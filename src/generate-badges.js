@@ -29,7 +29,7 @@ const mapToBadgeInputs = (index, summary) => {
 
 const [, , summariesFile] = process.argv;
 const summaries = JSON.parse(fs.readFileSync(summariesFile, 'utf8'));
-const allFiles = summaries
+const allBadges = summaries
     .sort((a, b) => a.view.localeCompare(b.view))
     .map((summary, index) => {
         return {
@@ -48,7 +48,7 @@ const allFiles = summaries
         return badge;
     });
 
-allFiles.forEach(badge => {
+allBadges.forEach(badge => {
     core.info(`Generated badge for ${badge.view} at ${badge.file}`);
     core.setOutput(badge.view, badge.file);
 });

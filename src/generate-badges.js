@@ -1,7 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-const core = require('@actions/core');
 const gradientBadge = require('gradient-badge');
+const core = require('@actions/core');
 
 const badgesOutputDir = 'badges/';
 fs.mkdirSync(badgesOutputDir, {recursive: true});

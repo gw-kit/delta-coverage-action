@@ -9,7 +9,7 @@ fs.mkdirSync(badgesOutputDir, {recursive: true});
 const secondColor = '#117efa'; // blue
 const firstColors = [
     '#ea00ff', // purple
-    '#00ff0d', // green
+    '#16a41f', // green
     '#2200ff', // blue
     '#ff1500', // red
     '#ffcc00', // yellow
@@ -29,7 +29,7 @@ const mapToBadgeInputs = (index, summary) => {
 
 const [, , summariesFile] = process.argv;
 const summaries = JSON.parse(fs.readFileSync(summariesFile, 'utf8'));
-const allBadges = summaries
+summaries
     .sort((a, b) => a.view.localeCompare(b.view))
     .map((summary, index) => {
         return {

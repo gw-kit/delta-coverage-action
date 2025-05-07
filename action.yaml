@@ -66,7 +66,7 @@ runs:
         script: |
           const badgesFiles = JSON.parse(`${{ toJson(steps.generate-badges.outputs) }}`);
           const render = require('${{ github.action_path }}/src/render-badges-in-summaries.js');
-          await render(badgesFiles);
+          await render({ badgesFiles, core });
 
     - name: Fetch PR Labels
       id: fetch-labels

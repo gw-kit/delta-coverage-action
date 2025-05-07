@@ -1,7 +1,7 @@
-module.exports = async (badgesFiles) => {
+module.exports = async (ctx) => {
     const fs = require('fs');
 
-    Object.values(badgesFiles)
+    Object.values(ctx.badgesFiles)
         .map(file => fs.readFileSync(file, 'utf8'))
         .map(badgeContent => Buffer.from(badgeContent).toString('base64'))
         .map(base64Data => `![badge](data:image/svg+xml;base64,${base64Data})`)
@@ -9,6 +9,6 @@ module.exports = async (badgesFiles) => {
             (buffer, badge) => {
                 return buffer.addRaw(badge, true)
             },
-            core.summary.addHeading('Coverage Badges', '4').addEOL()
+            ctx.core.summary.addHeading('Coverage Badges', '4').addEOL()
         );
 };

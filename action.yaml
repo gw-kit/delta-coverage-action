@@ -36,18 +36,18 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         script: |
-          const fs = require('fs');
-          const files = fs.readdirSync(`${{ inputs.summary-report-base-path }}`);
-          const summaryFiles = files.filter(file => file.includes('-summary.json'))
-            .filter(file => !file.includes('full-coverage-'));
-          
-          const summaries = summaryFiles.map(file => 
-            JSON.parse(fs.readFileSync(`build/reports/coverage-reports/${file}`, 'utf8'))
-          );
-          const allSummaries = JSON.stringify(summaries);
-          const allSummariesFile = 'all-summaries.json';
-          fs.writeFileSync(allSummariesFile, allSummaries);
-          core.setOutput('file', allSummariesFile);
+          const readSummaries = require('${{ github.action_path }}/src/read-summaries.js');
+          const summariesBaseDir = `${{ inputs.summary-report-base-path }}`;
+          const deltaSummariesFile = await readSummaries({
+            isFullCoverageMode: false,
+            baseSummariesPath: summariesBaseDir,
+          });
+          const fullCovSummariesFile = await readSummaries({
+            isFullCoverageMode: true,
+            baseSummariesPath: summariesBaseDir,
+          });
+          core.setOutput('delta', summariesFile);
+          core.setOutput('full', fullCovSummariesFile);
 
     - name: Fetch PR Labels
       id: fetch-labels

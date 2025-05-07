@@ -49,23 +49,14 @@ runs:
           core.setOutput('delta', deltaSummariesFile);
           core.setOutput('full', fullCovSummariesFile);
 
-    - name: install gradient-badge
-      shell: bash
+    - shell: bash
       run: npm install gradient-badge
 
     - name: Generate Badges
       id: generate-badges
       continue-on-error: true
-      uses: actions/github-script@v7
-      with:
-        script: |
-          const generate = require('${{ github.action_path }}/src/generate-badges.js');
-          const badges = await generate({
-            summariesFile: `${{ steps.all-summaries.outputs.full }}`,
-          });
-          badges.forEach((badge) => {
-            core.setOutput(badge.view, badge.file);
-          });
+      shell: bash
+      run: node ${{ github.action_path }}/src/generate-badges.js ${{ steps.all-summaries.outputs.full }}
 
     - name: Render Badges in Summaries
       continue-on-error: true
@@ -106,7 +97,7 @@ runs:
         script: |
           const createCheckRuns = require('${{ github.action_path }}/src/create-check-runs.js');
           const checkRuns = await createCheckRuns({
-            summaryReportPath: `${{ steps.all-summaries.outputs.file }}`,
+            summaryReportPath: `${{ steps.all-summaries.outputs.delta }}`,
             ignoreCoverageFailure: ${{ inputs.suppress-check-failures || steps.check-label.outputs.suppress_check_failures }},
             core: core,
             context: context,

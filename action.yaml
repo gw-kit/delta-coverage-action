@@ -25,6 +25,11 @@ inputs:
     required: false
     default: 'delta-coverage'
 
+outputs:
+  badges-dir:
+    description: 'Directory with generated badges.'
+    value: ${{ steps.generate-badges.outputs.all-files }}
+
 runs:
   using: "composite"
 
@@ -58,12 +63,6 @@ runs:
         src_path="${{ github.action_path }}/src"
         mv ./node_modules $src_path/
         node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
-
-    - id: upload-badges
-      uses: actions/upload-artifact@v4
-      with:
-        name: coverage-gen.svg
-        path: ${{ steps.generate-badges.outputs.all-files }}
 
     - name: Fetch PR Labels
       id: fetch-labels

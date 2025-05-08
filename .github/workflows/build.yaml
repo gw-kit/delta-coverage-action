@@ -27,7 +27,14 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Delta Coverage Action
+      - name: Publish Delta Coverage
+        id: render-delta-coverage
         uses: gw-kit/delta-coverage-action@test-badges
         with:
           summary-report-base-path: 'summaries/'
+
+      - id: upload-badges
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-gen.svg
+          path: ${{ steps.render-delta-coverage.outputs.badges-dir }}

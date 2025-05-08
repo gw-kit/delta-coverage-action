@@ -10,7 +10,7 @@ const secondColor = '#117efa'; // blue
 const firstColors = [
     '#ea00ff', // purple
     '#16a41f', // green
-    '#2200ff', // blue
+    '#16019f', // blue
     '#ff1500', // red
     '#ffcc00', // yellow
 ];

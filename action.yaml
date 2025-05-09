@@ -66,25 +66,27 @@ runs:
 
     - name: Fetch PR Labels
       id: fetch-labels
-      if: ${{ !inputs.suppress-check-failures }}
+      if: ${{ github.event_name == 'pull_request' }}
       shell: 'bash'
-      run: |
-        LABELS=$(gh api repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }} --jq '.labels[].name' || echo "")
-        LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
-        echo "labels=$LABELS_CLEAN" >> $GITHUB_OUTPUT
       env:
         GH_TOKEN: ${{ inputs.github-token }}
-
-    - name: Check for Suppress Label
-      id: check-label
-      if: ${{ !inputs.suppress-check-failures }}
-      shell: 'bash'
+        PR_ENDPOINT: "repos/${{ github.repository }}/pulls/${{ github.event.pull_request.number }}"
       run: |
-        if echo "${{ steps.fetch-labels.outputs.labels }}" | grep -q 'suppress-delta-coverage'; then
-          echo "suppress_check_failures=true" >> $GITHUB_OUTPUT
-        else
-          echo "suppress_check_failures=false" >> $GITHUB_OUTPUT
-        fi    
+        LABELS=$(gh api ${PR_ENDPOINT} --jq '.labels[].name' || echo "")
+        LABELS_CLEAN=$(echo "$LABELS" | tr '\n' ',' | sed 's/,$//')
+        echo "labels=$LABELS_CLEAN" >> $GITHUB_OUTPUT
+
+    - name: Check for Suppression
+      id: check-suppress
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const labels = '${{ steps.fetch-labels.outputs.labels }}';
+          const suppressedByLabel = labels.includes('suppress-delta-coverage');
+          const suppressedByInput = '${{ inputs.suppress-check-failures }}' === 'true';
+          const resolution = suppressedByLabel || suppressedByInput;
+          core.info(`Is suppress=${resolution} : by label=${suppressedByLabel}, by input=${suppressedByInput}`);
+          core.setOutput('suppress', resolution);
 
     - name: Create Check Run
       id: create-check-runs
@@ -95,11 +97,11 @@ runs:
           const createCheckRuns = require('${{ github.action_path }}/src/create-check-runs.js');
           const checkRuns = await createCheckRuns({
             summaryReportPath: `${{ steps.all-summaries.outputs.delta }}`,
-            ignoreCoverageFailure: ${{ inputs.suppress-check-failures || steps.check-label.outputs.suppress_check_failures }},
+            ignoreCoverageFailure: ${{ steps.check-suppress.outputs.suppress }},
             core: core,
             context: context,
             github: github,
-            headSha: `${{ github.event.pull_request.head.sha }}`,
+            headSha: `${{ github.event.pull_request.head.sha || github.sha }}`,
             externalId: `${{ inputs.external-id }}`
           });
           core.setOutput('check-runs', checkRuns);
@@ -131,6 +133,7 @@ runs:
           }
 
     - id: build-message
+      if: ${{ github.event_name == 'pull_request' }}
       uses: actions/github-script@v7
       with:
         github-token: ${{ inputs.github-token }}

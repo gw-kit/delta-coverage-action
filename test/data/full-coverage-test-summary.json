@@ -1,0 +1,1 @@
+{"view":"test","reportBound":"DELTA_REPORT","coverageRulesConfig":{"failOnViolation":false,"entitiesRules":{}},"verifications":[],"coverageInfo":[{"coverageEntity":"INSTRUCTION","covered":8860,"total":10775,"percents":82.23},{"coverageEntity":"BRANCH","covered":280,"total":371,"percents":75.47},{"coverageEntity":"LINE","covered":1800,"total":2187,"percents":82.3}]}

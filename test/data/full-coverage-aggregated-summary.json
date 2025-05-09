@@ -1,0 +1,29 @@
+{
+  "view": "aggregated",
+  "reportBound": "DELTA_REPORT",
+  "coverageRulesConfig": {
+    "failOnViolation": false,
+    "entitiesRules": {}
+  },
+  "verifications": [],
+  "coverageInfo": [
+    {
+      "coverageEntity": "INSTRUCTION",
+      "covered": 9406,
+      "total": 10775,
+      "percents": 87.29
+    },
+    {
+      "coverageEntity": "BRANCH",
+      "covered": 303,
+      "total": 377,
+      "percents": 80.37
+    },
+    {
+      "coverageEntity": "LINE",
+      "covered": 1943,
+      "total": 2209,
+      "percents": 87.96
+    }
+  ]
+}

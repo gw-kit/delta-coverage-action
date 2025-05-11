@@ -1,5 +1,7 @@
 # Delta Coverage Report GitHub Action
 
+![GitHub Release](https://img.shields.io/github/v/release/gw-kit/delta-coverage-action)
+
 The action creates check run with detailed coverage info based on the Delta-Coverage summary report.
 Also, the action creates a comment in the pull request with links to the check runs.
 
@@ -40,10 +42,12 @@ jobs:
           
     steps:
       - name: Publish Delta Coverage Report
-        uses: gw-kit/delta-coverage-action@main
+        uses: gw-kit/delta-coverage-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+The latest version: ![GitHub Release](https://img.shields.io/github/v/release/gw-kit/delta-coverage-action)
 
 ## Coverage Badges
 
@@ -58,6 +62,8 @@ deltaCoverageReport {
    }
 }
 ```
+
+⚠️ Min required [Delta-Coverage plugin](https://github.com/gw-kit/delta-coverage-action) is `3.4.0`.
 
 ### Badges example
 

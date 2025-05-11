@@ -64,10 +64,6 @@ runs:
         mv ./node_modules $src_path/
         node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
 
-    - name: Debug
-      shell: bash
-      run: echo 'output_ ${{ steps.generate-badges.outputs.badges-dir }}'
-
     - name: Fetch PR Labels
       id: fetch-labels
       if: ${{ github.event_name == 'pull_request' }}

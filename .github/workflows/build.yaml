@@ -33,10 +33,6 @@ jobs:
         with:
           summary-report-base-path: 'test/data/'
 
-      - name: Debug
-        shell: bash
-        run: echo 'output_ ${{ steps.render-delta-coverage.outputs.badges-dir }}'
-
       - id: upload-badges
         uses: actions/upload-artifact@v4
         with:

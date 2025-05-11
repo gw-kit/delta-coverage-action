@@ -50,4 +50,3 @@ summaries
     });
 
 core.setOutput('badges-dir', badgesOutputDir);
-core.info(`🏷 Generated badges in ${badgesOutputDir}`);

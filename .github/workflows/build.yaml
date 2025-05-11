@@ -1,0 +1,40 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - 'develop'
+      - 'main'
+      - 'release/**'
+  pull_request:
+    branches:
+      - '**'
+
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: read
+      checks: write
+      pull-requests: write
+      packages: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Publish Delta Coverage
+        id: render-delta-coverage
+        uses: gw-kit/delta-coverage-action@v1
+        with:
+          summary-report-base-path: 'test/data/'
+
+      - id: upload-badges
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-gen.svg
+          path: ${{ steps.render-delta-coverage.outputs.badges-dir }}

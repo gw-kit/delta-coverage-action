@@ -25,6 +25,11 @@ inputs:
     required: false
     default: 'delta-coverage'
 
+outputs:
+  badges-dir:
+    description: 'Directory with generated badges.'
+    value: ${{ steps.generate-badges.outputs.badges-dir }}
+
 runs:
   using: "composite"
 
@@ -36,18 +41,28 @@ runs:
       with:
         github-token: ${{ inputs.github-token }}
         script: |
-          const fs = require('fs');
-          const files = fs.readdirSync(`${{ inputs.summary-report-base-path }}`);
-          const summaryFiles = files.filter(file => file.includes('-summary.json'))
-            .filter(file => !file.includes('full-coverage-'));
-          
-          const summaries = summaryFiles.map(file => 
-            JSON.parse(fs.readFileSync(`build/reports/coverage-reports/${file}`, 'utf8'))
-          );
-          const allSummaries = JSON.stringify(summaries);
-          const allSummariesFile = 'all-summaries.json';
-          fs.writeFileSync(allSummariesFile, allSummaries);
-          core.setOutput('file', allSummariesFile);
+          const readSummaries = require('${{ github.action_path }}/src/read-summaries.js');
+          const summariesBaseDir = `${{ inputs.summary-report-base-path }}`;
+          const deltaSummariesFile = await readSummaries({
+            isFullCoverageMode: false,
+            baseSummariesPath: summariesBaseDir,
+          });
+          const fullCovSummariesFile = await readSummaries({
+            isFullCoverageMode: true,
+            baseSummariesPath: summariesBaseDir,
+          });
+          core.setOutput('delta', deltaSummariesFile);
+          core.setOutput('full', fullCovSummariesFile);
+
+    - name: Generate Badges
+      id: generate-badges
+      continue-on-error: true
+      shell: bash
+      run: |
+        npm install gradient-badge @actions/core
+        src_path="${{ github.action_path }}/src"
+        mv ./node_modules $src_path/
+        node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
 
     - name: Fetch PR Labels
       id: fetch-labels
@@ -81,7 +96,7 @@ runs:
         script: |
           const createCheckRuns = require('${{ github.action_path }}/src/create-check-runs.js');
           const checkRuns = await createCheckRuns({
-            summaryReportPath: `${{ steps.all-summaries.outputs.file }}`,
+            summaryReportPath: `${{ steps.all-summaries.outputs.delta }}`,
             ignoreCoverageFailure: ${{ steps.check-suppress.outputs.suppress }},
             core: core,
             context: context,

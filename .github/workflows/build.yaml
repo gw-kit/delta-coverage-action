@@ -29,9 +29,13 @@ jobs:
 
       - name: Publish Delta Coverage
         id: render-delta-coverage
-        uses: gw-kit/delta-coverage-action@v1
+        uses: gw-kit/delta-coverage-action@test-badges
         with:
           summary-report-base-path: 'test/data/'
+
+      - name: Debug
+        shell: bash
+        run: echo 'output_ ${{ steps.render-delta-coverage.outputs.badges-dir }}'
 
       - id: upload-badges
         uses: actions/upload-artifact@v4

@@ -29,7 +29,7 @@ jobs:
 
       - name: Publish Delta Coverage
         id: render-delta-coverage
-        uses: gw-kit/delta-coverage-action@${{ github.head_ref }}
+        uses: gw-kit/delta-coverage-action@v1
         with:
           summary-report-base-path: 'test/data/'
 

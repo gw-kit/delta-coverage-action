@@ -45,8 +45,8 @@ summaries
         };
     }).forEach(badge => {
         fs.writeFileSync(badge.file, badge.badgeContent);
-        core.info(`Generated badge for ${badge.view} at ${badge.file}`);
+        core.info(`🏷️ Generated badge for ${badge.view} at ${badge.file}`);
         core.setOutput(badge.view, badge.file);
     });
 
-core.setOutput('all-files', badgesOutputDir);
+core.setOutput('badges-dir', badgesOutputDir);

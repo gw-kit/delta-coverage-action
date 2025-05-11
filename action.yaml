@@ -28,7 +28,7 @@ inputs:
 outputs:
   badges-dir:
     description: 'Directory with generated badges.'
-    value: ${{ steps.generate-badges.outputs.all-files }}
+    value: ${{ steps.generate-badges.outputs.badges-dir }}
 
 runs:
   using: "composite"

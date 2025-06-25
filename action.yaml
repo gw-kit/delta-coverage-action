@@ -82,7 +82,7 @@ runs:
       with:
         script: |
           const labels = '${{ steps.fetch-labels.outputs.labels }}';
-          const suppressedByLabel = labels.includes('suppress-delta-coverage');
+          const suppressedByLabel = labels.includes('suppress-coverage');
           const suppressedByInput = '${{ inputs.suppress-check-failures }}' === 'true';
           const resolution = suppressedByLabel || suppressedByInput;
           core.info(`Is suppress=${resolution} : by label=${suppressedByLabel}, by input=${suppressedByInput}`);

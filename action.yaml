@@ -105,7 +105,7 @@ runs:
             try { return script(view) } catch(e) { 
              return `Error in custom script: ${e}`
             };
-          }
+          };
           const checkRuns = await createCheckRuns({
             summaryReportPath: `${{ steps.all-summaries.outputs.delta }}`,
             ignoreCoverageFailure: ${{ steps.check-suppress.outputs.suppress }},

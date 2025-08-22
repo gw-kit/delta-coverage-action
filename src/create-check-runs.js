@@ -32,7 +32,7 @@ module.exports = async (ctx) => {
         const conclusion = computeViewConclusion(view);
         const viewName = capitalize(view.view);
         const summaryExtra = ctx.summaryExtraFun ? ctx.summaryExtraFun(view) : '';
-        const summary = `${readViewMarkdownReport(view)}\n\n<!-- This is Delta Coverage CheckRun -->${summaryExtra}`;
+        const summary = `${readViewMarkdownReport(view)}\n\n<!-- This is Delta Coverage CheckRun -->\n${summaryExtra}`;
 
         const response = await ctx.github.rest.checks.create({
             owner: ctx.context.repo.owner,

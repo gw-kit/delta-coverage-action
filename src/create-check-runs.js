@@ -48,6 +48,7 @@ module.exports = async (ctx) => {
         });
         return {
             viewName: viewName,
+            view: view.view,
             verifications: view.verifications,
             coverageRules: view.coverageRulesConfig,
             url: response.data.html_url,

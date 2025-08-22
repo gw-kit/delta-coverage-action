@@ -69,6 +69,32 @@ module.exports = (ctx) => {
             return `<img src="${imageLink}" />`;
         }
 
+        const buildHtmlReportLink = (checkRun) => {
+            if (!ctx.additionalData || ctx.additionalData.trim() === '') return '';
+
+            let baseUrl = ctx.additionalData.trim();
+
+            if (baseUrl.endsWith('/')) {
+                baseUrl = baseUrl.slice(0, -1);
+            }
+
+            let viewPath = checkRun.view;
+            if (viewPath === 'functionalTest') {
+                viewPath = 'functional-test';
+            } else if (viewPath === 'integrationTest') {
+                viewPath = 'integration-test';
+            } else if (viewPath === 'unitTest') {
+                viewPath = 'unit-test';
+            } else if (viewPath === 'componentTest') {
+                viewPath = 'component-test';
+            } else if (viewPath === 'archUnitTest') {
+                viewPath = 'arch-unit-test';
+            }
+            
+            const htmlUrl = `${baseUrl}/${viewPath}/html/index.html`;
+            return ` | <a href="${htmlUrl}" target="_blank">📊 HTML Report</a>`;
+        };
+
         const buildExpectedValue = (entityData) => {
             return (entityData.expected > NO_VALUE) ? `🎯 ${entityData.expected}% 🎯` : '';
         }
@@ -91,8 +117,9 @@ module.exports = (ctx) => {
 
         const hasFailure = viewSummaryData.some(it => it.isFailed);
         const statusSymbol = hasFailure ? '🔴' : '🟢';
+        const htmlReportLink = buildHtmlReportLink(checkRun);
         const viewCellValue = `
-            <td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a></td>
+            <td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a>${htmlReportLink}</td>
         `.trim();
 
         const foldExpectedColumn = obtainUniqueValuesSet(viewSummaryData, it => it.expected).size === 1;
@@ -101,7 +128,7 @@ module.exports = (ctx) => {
         const foldActualColumn = actualUniqueValues.size === 1
             && (foldExpectedColumn || actualUniqueValues.has(NO_VALUE));
 
-        return viewSummaryData.map((entityData, index) => {
+        const tableRows = viewSummaryData.map((entityData, index) => {
             const viewCellInRow = (index === 0) ? viewCellValue : '';
 
             const actualColumnHtml = buildCoverageValueColumnHtml(entityData, index, foldActualColumn, buildProgressImg);
@@ -116,6 +143,14 @@ module.exports = (ctx) => {
                 ${actualColumnHtml}
             </tr>`.trim().replace(/^ +/gm, '');
         }).join('\n');
+
+        const htmlReportLinkBelow = buildHtmlReportLink(checkRun);
+        if (htmlReportLinkBelow) {
+            const linkText = htmlReportLinkBelow.replace(' | ', '');
+            return tableRows + '\n<tr><td colspan="4" style="text-align: center; padding-top: 10px;">' + linkText + '</td></tr>';
+        }
+        
+        return tableRows;
     }
 
     const renderHeaders = () => {
@@ -128,7 +163,19 @@ module.exports = (ctx) => {
 
         const workflowRunLink = `[Run ${workflowNum}](${workflowUrl})`;
         const formattedDate = workflowRunDate.toLocaleString('en-US', options);
-        return `${workflowRunLink} | \`${formattedDate}\``;
+        
+        let result = `${workflowRunLink} | \`${formattedDate}\``;
+
+        if (ctx.additionalData && ctx.additionalData.trim() !== '') {
+            let baseUrl = ctx.additionalData.trim();
+            if (baseUrl.endsWith('/')) {
+                baseUrl = baseUrl.slice(0, -1);
+            }
+            const aggregatedHtmlUrl = `${baseUrl}/aggregated/html/index.html`;
+            result += ` | [📊 Full Coverage Report](${aggregatedHtmlUrl})`;
+        }
+        
+        return result;
     };
 
     const checkRuns = JSON.parse(ctx.checkRunsContent);

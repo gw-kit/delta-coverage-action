@@ -25,6 +25,11 @@ inputs:
     required: false
     default: 'delta-coverage'
 
+  additional-data:
+    description: 'Base path for HTML coverage reports (e.g., snapshot/backend/coverage/example-service/pr-2822/17153419223/).'
+    required: false
+    default: ''
+
 outputs:
   badges-dir:
     description: 'Directory with generated badges.'
@@ -143,7 +148,8 @@ runs:
             checkRunsContent: `${{ steps.create-check-runs.outputs.check-runs }}`,
             commentTitle: '${{ inputs.title }}',
             commentMarker: `${{ steps.comment-marker.outputs.result }}`,
-            core: core
+            core: core,
+            additionalData: `${{ inputs.additional-data }}`
           });
 
     - name: Update or Create Comment
@@ -158,13 +164,15 @@ runs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: '${{ steps.find-comment.outputs.result }}',
-              body: ${{ steps.build-message.outputs.result }}
+              body: ${{ steps.build-message.outputs.result }},
+              link: `${{ inputs.additional-data }}`
             })
           } else {
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: ${{ steps.build-message.outputs.result }}
+              body: ${{ steps.build-message.outputs.result }},
+              link: `${{ inputs.additional-data }}`
             })
           }

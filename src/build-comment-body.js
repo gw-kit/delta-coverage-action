@@ -69,6 +69,18 @@ module.exports = (ctx) => {
             return `<img src="${imageLink}" />`;
         }
 
+        const buildHtmlReportLink = (checkRun) => {
+            if (!ctx.additionalData) return '';
+            
+            // Створюємо URL до HTML звіту на основі additional-data та view
+            const baseUrl = ctx.additionalData.trim();
+            if (!baseUrl) return '';
+            
+            // Додаємо view та /html/index.html
+            const htmlUrl = `${baseUrl}/${checkRun.viewName.toLowerCase()}/html/index.html`;
+            return ` | <a href="${htmlUrl}" target="_blank">📊 HTML Report</a>`;
+        };
+
         const buildExpectedValue = (entityData) => {
             return (entityData.expected > NO_VALUE) ? `🎯 ${entityData.expected}% 🎯` : '';
         }
@@ -91,8 +103,9 @@ module.exports = (ctx) => {
 
         const hasFailure = viewSummaryData.some(it => it.isFailed);
         const statusSymbol = hasFailure ? '🔴' : '🟢';
+        const htmlReportLink = buildHtmlReportLink(checkRun);
         const viewCellValue = `
-            <td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a></td>
+            <td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a>${htmlReportLink}</td>
         `.trim();
 
         const foldExpectedColumn = obtainUniqueValuesSet(viewSummaryData, it => it.expected).size === 1;
@@ -128,7 +141,17 @@ module.exports = (ctx) => {
 
         const workflowRunLink = `[Run ${workflowNum}](${workflowUrl})`;
         const formattedDate = workflowRunDate.toLocaleString('en-US', options);
-        return `${workflowRunLink} | \`${formattedDate}\``;
+        
+        let result = `${workflowRunLink} | \`${formattedDate}\``;
+        
+        // Додаємо загальний HTML report link, якщо є additional-data
+        if (ctx.additionalData && ctx.additionalData.trim()) {
+            const baseUrl = ctx.additionalData.trim();
+            const aggregatedHtmlUrl = `${baseUrl}/aggregated/html/index.html`;
+            result += ` | [📊 Full Coverage Report](${aggregatedHtmlUrl})`;
+        }
+        
+        return result;
     };
 
     const checkRuns = JSON.parse(ctx.checkRunsContent);

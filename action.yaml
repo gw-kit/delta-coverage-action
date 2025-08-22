@@ -25,6 +25,11 @@ inputs:
     required: false
     default: 'delta-coverage'
 
+  check-run-extra-render-script:
+    description: 'Script to render additional info in check run.'
+    required: false
+    default: ''
+
 outputs:
   badges-dir:
     description: 'Directory with generated badges.'
@@ -95,6 +100,12 @@ runs:
         github-token: ${{ inputs.github-token }}
         script: |
           const createCheckRuns = require('${{ github.action_path }}/src/create-check-runs.js');
+          const extraRenderScript = (view) => {
+            const script = ${{ inputs.check-run-extra-render-script || '(v) => ""' }};
+            try { return script(view) } catch(e) { 
+             return `Error in custom script: ${e}`
+            };
+          };
           const checkRuns = await createCheckRuns({
             summaryReportPath: `${{ steps.all-summaries.outputs.delta }}`,
             ignoreCoverageFailure: ${{ steps.check-suppress.outputs.suppress }},
@@ -102,7 +113,8 @@ runs:
             context: context,
             github: github,
             headSha: `${{ github.event.pull_request.head.sha || github.sha }}`,
-            externalId: `${{ inputs.external-id }}`
+            externalId: `${{ inputs.external-id }}`,
+            summaryExtraFun: extraRenderScript
           });
           core.setOutput('check-runs', checkRuns);
 

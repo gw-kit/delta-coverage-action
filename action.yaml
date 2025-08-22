@@ -148,8 +148,7 @@ runs:
             checkRunsContent: `${{ steps.create-check-runs.outputs.check-runs }}`,
             commentTitle: '${{ inputs.title }}',
             commentMarker: `${{ steps.comment-marker.outputs.result }}`,
-            core: core,
-            additionalData: `${{ inputs.additional-data }}`
+            core: core
           });
 
     - name: Update or Create Comment
@@ -164,15 +163,13 @@ runs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               comment_id: '${{ steps.find-comment.outputs.result }}',
-              body: ${{ steps.build-message.outputs.result }},
-              link: `${{ inputs.additional-data }}`
+              body: ${{ steps.build-message.outputs.result }}
             })
           } else {
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: ${{ steps.build-message.outputs.result }},
-              link: `${{ inputs.additional-data }}`
+              body: ${{ steps.build-message.outputs.result }}
             })
           }

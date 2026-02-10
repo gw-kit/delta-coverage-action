@@ -59,15 +59,24 @@ runs:
           core.setOutput('delta', deltaSummariesFile);
           core.setOutput('full', fullCovSummariesFile);
 
-    - name: Generate Badges
-      id: generate-badges
+    - name: Install Badge Dependencies
       continue-on-error: true
       shell: bash
       run: |
-        npm install gradient-badge @actions/core
-        src_path="${{ github.action_path }}/src"
-        mv ./node_modules $src_path/
-        node $src_path/generate-badges.js ${{ steps.all-summaries.outputs.full }}
+        npm install gradient-badge
+        mv ./node_modules "${{ github.action_path }}/src/"
+
+    - name: Generate Badges
+      id: generate-badges
+      continue-on-error: true
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const generateBadges = require('${{ github.action_path }}/src/generate-badges.js');
+          await generateBadges({
+            summariesFile: '${{ steps.all-summaries.outputs.full }}',
+            core: core
+          });
 
     - name: Fetch PR Labels
       id: fetch-labels

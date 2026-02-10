@@ -27,9 +27,23 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build
+        run: npm run build
+
       - name: Publish Delta Coverage
         id: render-delta-coverage
-        uses: gw-kit/delta-coverage-action@v1
+        uses: ./
         with:
           summary-report-base-path: 'test/data/'
 

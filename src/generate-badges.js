@@ -1,10 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 const gradientBadge = require('gradient-badge');
-const core = require('@actions/core');
 
 const badgesOutputDir = 'badges/';
-fs.mkdirSync(badgesOutputDir, {recursive: true});
 
 const secondColor = '#117efa'; // blue
 const firstColors = [
@@ -27,26 +25,31 @@ const mapToBadgeInputs = (index, summary) => {
     };
 };
 
-const [, , summariesFile] = process.argv;
-const summaries = JSON.parse(fs.readFileSync(summariesFile, 'utf8'));
-summaries
-    .sort((a, b) => a.view.localeCompare(b.view))
-    .map((summary, index) => {
-        return {
-            view: summary.view,
-            badgeInputs: mapToBadgeInputs(index, summary),
-        }
-    })
-    .map(viewBadgeData => {
-        return {
-            view: viewBadgeData.view,
-            file: path.join(badgesOutputDir, `${viewBadgeData.view}.svg`),
-            badgeContent: gradientBadge(viewBadgeData.badgeInputs),
-        };
-    }).forEach(badge => {
-        fs.writeFileSync(badge.file, badge.badgeContent);
-        core.info(`🏷️ Generated badge for ${badge.view} at ${badge.file}`);
-        core.setOutput(badge.view, badge.file);
-    });
+module.exports = async (ctx) => {
+    const { core, summariesFile } = ctx;
 
-core.setOutput('badges-dir', badgesOutputDir);
+    fs.mkdirSync(badgesOutputDir, {recursive: true});
+
+    const summaries = JSON.parse(fs.readFileSync(summariesFile, 'utf8'));
+    summaries
+        .sort((a, b) => a.view.localeCompare(b.view))
+        .map((summary, index) => {
+            return {
+                view: summary.view,
+                badgeInputs: mapToBadgeInputs(index, summary),
+            }
+        })
+        .map(viewBadgeData => {
+            return {
+                view: viewBadgeData.view,
+                file: path.join(badgesOutputDir, `${viewBadgeData.view}.svg`),
+                badgeContent: gradientBadge(viewBadgeData.badgeInputs),
+            };
+        }).forEach(badge => {
+            fs.writeFileSync(badge.file, badge.badgeContent);
+            core.info(`🏷️ Generated badge for ${badge.view} at ${badge.file}`);
+            core.setOutput(badge.view, badge.file);
+        });
+
+    core.setOutput('badges-dir', badgesOutputDir);
+};

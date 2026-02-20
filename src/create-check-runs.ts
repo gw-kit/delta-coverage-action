@@ -50,8 +50,9 @@ function capitalize(s: string): string {
   return s.charAt(0).toUpperCase() + s.slice(1);
 }
 
-function computeViewConclusion(view: CoverageSummary, ignoreCoverageFailure: boolean): 'success' | 'failure' {
-  return !ignoreCoverageFailure && viewHasViolations(view) ? 'failure' : 'success';
+function computeViewConclusion(view: CoverageSummary, ignoreCoverageFailure: boolean): 'success' | 'failure' | 'neutral' {
+  if (!viewHasViolations(view)) return 'success';
+  return ignoreCoverageFailure ? 'neutral' : 'failure';
 }
 
 async function createCheckRun(

@@ -33,6 +33,6 @@ export interface CheckRunResult {
   verifications: Verification[];
   coverageRules: CoverageRulesConfig;
   url: string;
-  conclusion: 'success' | 'failure';
+  conclusion: 'success' | 'failure' | 'neutral';
   coverageInfo: CoverageInfo[];
 }

@@ -89,10 +89,12 @@ describe('buildCommentBody', () => {
 
     expect(result).toContain('🟢');
     expect(result).not.toContain('🔴');
+    expect(result).not.toContain('(suppressed)');
   });
 
-  it('should show failure status symbol when violations exist and failOnViolation is true', () => {
+  it('should show failure status symbol when conclusion is failure', () => {
     const checkRun = makeCheckRun({
+      conclusion: 'failure',
       coverageRules: {
         failOnViolation: true,
         entitiesRules: {
@@ -113,6 +115,58 @@ describe('buildCommentBody', () => {
     });
 
     expect(result).toContain('🔴');
+  });
+
+  it('should show failure status when conclusion is failure even with failOnViolation disabled', () => {
+    const checkRun = makeCheckRun({
+      conclusion: 'failure',
+      coverageRules: {
+        failOnViolation: false,
+        entitiesRules: {
+          INSTRUCTION: { minCoverageRatio: 0.9 },
+        },
+      },
+    });
+    const mockBuilder = createMockSummaryBuilder();
+
+    const result = buildCommentBody({
+      checkRunsContent: JSON.stringify([checkRun]),
+      commentTitle: 'Title',
+      commentMarker: '',
+      core: { summary: mockBuilder },
+      env: defaultEnv,
+    });
+
+    expect(result).toContain('🔴');
+    expect(result).not.toContain('🟢');
+  });
+
+  it('should show neutral status symbol when conclusion is neutral (suppressed failure)', () => {
+    const checkRun = makeCheckRun({
+      conclusion: 'neutral',
+      coverageRules: {
+        failOnViolation: true,
+        entitiesRules: {
+          INSTRUCTION: { minCoverageRatio: 0.99 },
+          BRANCH: { minCoverageRatio: 0.99 },
+          LINE: { minCoverageRatio: 0.99 },
+        },
+      },
+    });
+    const mockBuilder = createMockSummaryBuilder();
+
+    const result = buildCommentBody({
+      checkRunsContent: JSON.stringify([checkRun]),
+      commentTitle: 'Title',
+      commentMarker: '',
+      core: { summary: mockBuilder },
+      env: defaultEnv,
+    });
+
+    expect(result).toContain('🟡');
+    expect(result).toContain('<sup>(suppressed)</sup>');
+    expect(result).not.toContain('🟢');
+    expect(result).not.toContain('🔴');
   });
 
   it('should use progress bar with success color when actual >= expected', () => {

@@ -17,7 +17,6 @@ const TOOLTIPS = new Map<string, string>([
 
 interface EntityData {
   entity: CoverageEntity;
-  isFailed: boolean;
   expected: number;
   actual: number;
 }
@@ -52,17 +51,13 @@ function buildViewSummaryData(checkRun: CheckRunResult): EntityData[] {
     return acc;
   }, new Map<string, number>());
 
-  const shouldFailOnViolations = checkRun.coverageRules?.failOnViolation || false;
   return ENTITIES.map((entity) => {
     const expectedPercents = entityToExpectedPercents.get(entity) || NO_VALUE;
     const actualPercents = entityToActualPercents.get(entity) !== undefined
       ? entityToActualPercents.get(entity)!
       : NO_VALUE;
 
-    const isFailed = shouldFailOnViolations
-      && actualPercents > NO_VALUE
-      && actualPercents < expectedPercents;
-    return { entity, isFailed, expected: expectedPercents, actual: actualPercents };
+    return { entity, expected: expectedPercents, actual: actualPercents };
   });
 }
 
@@ -105,9 +100,10 @@ function obtainUniqueValuesSet<T>(viewSummaryData: EntityData[], valueProvider: 
 function buildCheckRunForViewText(checkRun: CheckRunResult): string {
   const viewSummaryData = buildViewSummaryData(checkRun);
 
-  const hasFailure = viewSummaryData.some(it => it.isFailed);
-  const statusSymbol = hasFailure ? '🔴' : '🟢';
-  const viewCellValue = `<td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a></td>`;
+  const STATUS_SYMBOLS: Record<string, string> = { failure: '🔴', neutral: '🟡' };
+  const statusSymbol = STATUS_SYMBOLS[checkRun.conclusion] || '🟢';
+  const suppressedLabel = checkRun.conclusion === 'neutral' ? ' <sup>(suppressed)</sup>' : '';
+  const viewCellValue = `<td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a>${suppressedLabel}</td>`;
 
   const foldExpectedColumn = obtainUniqueValuesSet(viewSummaryData, it => it.expected).size === 1;
   const actualUniqueValues = obtainUniqueValuesSet(viewSummaryData, it => it.actual);

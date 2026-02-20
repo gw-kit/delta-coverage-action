@@ -103,7 +103,7 @@ describe('createCheckRuns', () => {
     const params = makeParams({ ignoreCoverageFailure: true });
     const result = await createCheckRuns(params);
 
-    expect(result[0].conclusion).toBe('success');
+    expect(result[0].conclusion).toBe('neutral');
   });
 
   it('should log error annotations for violations', async () => {

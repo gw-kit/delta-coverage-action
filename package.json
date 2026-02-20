@@ -1,6 +1,6 @@
 {
   "name": "delta-coverage-action",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "GitHub Action for Delta Coverage reports",
   "main": "dist/index.js",
   "scripts": {

@@ -100,7 +100,8 @@ function obtainUniqueValuesSet<T>(viewSummaryData: EntityData[], valueProvider: 
 function buildCheckRunForViewText(checkRun: CheckRunResult): string {
   const viewSummaryData = buildViewSummaryData(checkRun);
 
-  const statusSymbol = checkRun.conclusion === 'failure' ? '🔴' : '🟢';
+  const STATUS_SYMBOLS: Record<string, string> = { failure: '🔴', neutral: '🟡' };
+  const statusSymbol = STATUS_SYMBOLS[checkRun.conclusion] || '🟢';
   const viewCellValue = `<td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a></td>`;
 
   const foldExpectedColumn = obtainUniqueValuesSet(viewSummaryData, it => it.expected).size === 1;

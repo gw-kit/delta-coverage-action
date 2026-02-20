@@ -140,9 +140,9 @@ describe('buildCommentBody', () => {
     expect(result).not.toContain('🟢');
   });
 
-  it('should show success status when conclusion is success despite low coverage', () => {
+  it('should show neutral status symbol when conclusion is neutral (suppressed failure)', () => {
     const checkRun = makeCheckRun({
-      conclusion: 'success',
+      conclusion: 'neutral',
       coverageRules: {
         failOnViolation: true,
         entitiesRules: {
@@ -162,7 +162,8 @@ describe('buildCommentBody', () => {
       env: defaultEnv,
     });
 
-    expect(result).toContain('🟢');
+    expect(result).toContain('🟡');
+    expect(result).not.toContain('🟢');
     expect(result).not.toContain('🔴');
   });
 

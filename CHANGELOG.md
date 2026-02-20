@@ -1,5 +1,10 @@
 # Delta Coverage Action
 
+## 1.4
+
+- Suppressed coverage failures now use `neutral` check run conclusion (gray dash icon) instead of `success`.
+  PR comment shows `🟡` for suppressed failures, distinguishing them from genuinely passing checks (`🟢`).
+
 ## 1.3
 
 - Fixed PR comment status inconsistent with check run conclusion.

@@ -30131,7 +30131,8 @@ function buildCheckRunForViewText(checkRun) {
     const viewSummaryData = buildViewSummaryData(checkRun);
     const STATUS_SYMBOLS = { failure: '🔴', neutral: '🟡' };
     const statusSymbol = STATUS_SYMBOLS[checkRun.conclusion] || '🟢';
-    const viewCellValue = `<td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a></td>`;
+    const suppressedLabel = checkRun.conclusion === 'neutral' ? ' <sup>(suppressed)</sup>' : '';
+    const viewCellValue = `<td rowspan=3>${statusSymbol} <a href="${checkRun.url}">${checkRun.viewName}</a>${suppressedLabel}</td>`;
     const foldExpectedColumn = obtainUniqueValuesSet(viewSummaryData, it => it.expected).size === 1;
     const actualUniqueValues = obtainUniqueValuesSet(viewSummaryData, it => it.actual);
     const foldActualColumn = actualUniqueValues.size === 1

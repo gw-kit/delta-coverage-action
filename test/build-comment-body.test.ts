@@ -89,6 +89,7 @@ describe('buildCommentBody', () => {
 
     expect(result).toContain('🟢');
     expect(result).not.toContain('🔴');
+    expect(result).not.toContain('(suppressed)');
   });
 
   it('should show failure status symbol when conclusion is failure', () => {
@@ -163,6 +164,7 @@ describe('buildCommentBody', () => {
     });
 
     expect(result).toContain('🟡');
+    expect(result).toContain('<sup>(suppressed)</sup>');
     expect(result).not.toContain('🟢');
     expect(result).not.toContain('🔴');
   });
